@@ -1,6 +1,3 @@
-# Ninja-API-Hunter
-REST API Recon &amp; Vulnerability Scanner Tool
-
 # Ninja-API-Hunter 🥷
 A lightweight, fast, and multi-threaded REST API reconnaissance and vulnerability scanning tool designed for Bug Bounty Hunters and Security Researchers. 
 
