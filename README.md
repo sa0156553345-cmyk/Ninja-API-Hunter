@@ -15,12 +15,14 @@
 
 ## Installation
 
+`bash
 git clone https://github.com/sa0156553345-cmyk/Ninja-API-Hunter.git
 cd Ninja-API-Hunter
 pip install -r requirements.txt
 
-## Usage
+bash
 
+## Usage
 Basic Scan:
 python3 ninja_hunter_v2.py -t https://api.target.com -w wordlist.txt
 
