@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+*.json
+*.csv
+.DS_Store
