@@ -1,0 +1,9 @@
+api
+api/v1
+api/v2
+admin
+users
+health
+status
+config
+swagger.json
