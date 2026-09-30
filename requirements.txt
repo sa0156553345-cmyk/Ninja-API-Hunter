@@ -1,0 +1,2 @@
+aiohttp>=3.9.0
+aiohappyeyeballs>=2.5.0
