@@ -1,4 +1,4 @@
-# 🥷 Ninja-API-Hunter v2.0
+# Ninja-API-Hunter v2.0
 
 > Advanced API Security Scanner optimized for Termux and Mobile Bug Bounty Hunting
 
