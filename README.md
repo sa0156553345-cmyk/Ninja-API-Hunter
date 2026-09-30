@@ -4,12 +4,12 @@ An advanced, asynchronous API security scanner designed for REST API reconnaissa
 
 ## Features
 
-- AsyncIO Engine: High-performance asynchronous HTTP requests.
-- Multi-Method Support: Supports GET, POST, PUT, DELETE, and PATCH methods.
-- Authentication Handling: Custom headers, Bearer tokens, and API key support.
-- Pattern Matching: Regex-based extraction of sensitive data from HTTP responses.
-- Export Options: Export scan results to JSON or CSV formats.
-- Proxy Integration: Built-in support for HTTP proxies such as Burp Suite.
+* **AsyncIO Engine**: High-performance asynchronous HTTP requests.
+* **Multi-Method Support**: Supports GET, POST, PUT, DELETE, and PATCH methods.
+* **Authentication Handling**: Custom headers, Bearer tokens, and API key support.
+* **Pattern Matching**: Regex-based extraction of sensitive data from HTTP responses.
+* **Export Options**: Export scan results to JSON or CSV formats.
+* **Proxy Integration**: Built-in support for HTTP proxies such as Burp Suite.
 
 ## Installation
 
