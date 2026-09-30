@@ -2,7 +2,7 @@
 ```markdown
 # 🥷 Ninja-API-Hunter v2.0
 
-> Advanced API Security Scanner optimized for **Termux** and **Mobile Bug Bounty Hunting**
+ Advanced API Security Scanner optimized for **Termux** and **Mobile Bug Bounty Hunting
 
 ![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
