@@ -1,4 +1,4 @@
-# ðŸ¥· Ninja-API-Hunter v3.0
+# 🥷 Ninja-API-Hunter v3.0
 
 An async REST API recon tool built for Termux. Give it a target and a
 wordlist; it finds live endpoints, pulls in extra paths from robots.txt /
@@ -12,7 +12,7 @@ the responses.
 ## What changed from v2.0
 
 v2.0 was, honestly, a path fuzzer plus response grepping with the SSL
-check turned off â€” that's a fair description from a friend's review, and
+check turned off — that's a fair description from a friend's review, and
 it's why v3.0 exists. Specifically:
 
 | v2.0 | v3.0 |
@@ -25,7 +25,7 @@ it's why v3.0 exists. Specifically:
 | Single 400-line file | Split into `ninja_hunter/{scanner,discovery,detectors,cli,colors}.py` |
 | No tests | 22 unit tests over the detection/discovery logic (`tests/`) |
 
-It's still not a replacement for `ffuf`/`httpx`/`nuclei` â€” those are
+It's still not a replacement for `ffuf`/`httpx`/`nuclei` — those are
 mature, heavily-tested projects. This is a personal tool that now does a
 few of the same ideas (schema-driven discovery, passive signature
 matching) in a single Termux-friendly script.
@@ -97,7 +97,7 @@ schemas, verbose stack traces (Python/Java/.NET/Node/PHP), missing
 `Strict-Transport-Security` / `X-Content-Type-Options` / `X-Frame-Options`
 / `Content-Security-Policy` headers on HTML responses.
 
-None of this exploits anything â€” it only recognizes things a server is
+None of this exploits anything — it only recognizes things a server is
 already handing back in a normal response.
 
 ## Better wordlists
@@ -114,7 +114,7 @@ curl -sL "https://raw.githubusercontent.com/danielmiessler/SecLists/master/Disco
 
 ## Tests
 
-No extra dependencies needed â€” the detection/discovery logic is pure
+No extra dependencies needed — the detection/discovery logic is pure
 functions, tested with the standard library:
 
 ```bash
@@ -132,4 +132,4 @@ For educational purposes and **authorized security testing only**.
 
 ## License
 
-MIT â€” see `LICENSE`.
+MIT — see `LICENSE`.
