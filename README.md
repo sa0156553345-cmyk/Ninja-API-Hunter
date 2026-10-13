@@ -1,169 +1,153 @@
 # Ninja-API-Hunter v4.0
 
-![Python](https://img.shields.io/badge/Python-3.8+-blue)
-![License](https://img.shields.io/badge/License-MIT-green)
-![Version](https://img.shields.io/badge/Version-4.0-orange)
+[![Python 3.8+](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+[![Version](https://img.shields.io/badge/Version-4.0-orange)]()
+[![Tests](https://img.shields.io/badge/tests-30%20OK-brightgreen)]()
 
-An asynchronous API reconnaissance and security-assessment toolkit for
-Termux and Linux, built on Python's `asyncio` + `aiohttp`.
+A lightweight, asynchronous REST API reconnaissance and vulnerability-scanning toolkit — fast enough for Termux and Linux, designed to find misconfigurations and suspicious patterns so you can verify them manually.
 
-It helps map an API's attack surface and spot common
-misconfigurations: exposed secrets, missing security headers, CORS
-misconfigurations, undocumented endpoints pulled from Swagger/OpenAPI
-specs, and broken object-level authorization (BOLA/IDOR) between two
-accounts you control.
+Why this tool?
+- Practical recon + detection workflow focused on APIs (not an exploit framework).
+- Fast async engine (aiohttp + asyncio) with adaptive rate limiting.
+- Built-in Swagger/OpenAPI expansion, robots/sitemap discovery, secret/stack-trace grep, CORS & BOLA/IDOR heuristics.
+- Small, dependency-light test suite — easy to run and verify locally.
 
-> **Use only on systems you own or are explicitly authorized to test**
-> (your own infrastructure, a client engagement with signed
-> authorization, or an in-scope bug bounty target). Scanning systems
-> without permission may be illegal in your jurisdiction. The authors
-> take no responsibility for misuse.
+Demo (screenshots)
 
-## What it actually does (and doesn't)
+Below are the demo images included in this branch. If you want different filenames or higher-resolution images, replace the files in docs/ with your preferred PNGs (keep the same names or update the references below).
 
-This is a **reconnaissance and detection** tool, not an exploit
-framework. It sends requests and flags *patterns* worth a human's
-attention — it does not automatically confirm or exploit a
-vulnerability. Specifically:
+![Repo view](./docs/screenshot-1.png)
+![CLI demo](./docs/screenshot-2.png)
+![Tests OK](./docs/screenshot-3.png)
 
-- The BOLA/IDOR check is a **heuristic differential test**. A flagged
-  endpoint needs manual verification; it is not proof of a
-  vulnerability on its own.
-- The secret-pattern grep looks for regex shapes (JWTs, cloud keys,
-  private-key headers, etc.) in response bodies. False positives are
-  possible, and it cannot find secret formats it has no pattern for.
-- The CORS check only verifies origin reflection and the
-  `Access-Control-Allow-Credentials` header; it doesn't simulate a
-  full cross-origin attack chain.
+Quick Start (Termux / Linux)
+1. Clone & install
+   ```bash
+   git clone https://github.com/sa0156553345-cmyk/Ninja-API-Hunter.git
+   cd Ninja-API-Hunter
+   pip install -r requirements.txt
+   # Optional: install as CLI
+   pip install -e .
+   ```
+2. Run a quick discovery scan:
+   ```bash
+   python3 run.py -t https://api.target.com -w wordlist.txt -o report.json
+   ```
+3. View results (JSON / HTML):
+   - JSON: open report.json
+   - HTML: open report.html in a browser (when using `--format html`)
 
-## Features
+Core features
+- Async request engine (high throughput with low resources)
+- Adaptive rate-limiter: backs off on 429/503 automatically
+- Swagger/OpenAPI auto-discovery and path expansion
+- Passive discovery from robots.txt and sitemap.xml
+- BOLA/IDOR heuristic differential testing (requires two tokens)
+- CORS reflection + Access-Control-Allow-Credentials checks
+- Secret and stack-trace pattern scanning (configurable patterns)
+- Exposed-file probes (.git/config, .env, etc.)
+- JSON and HTML reporting
+- 30 fast unit tests that don't require network
 
-- **Async core** — `aiohttp`-based engine, capable of hundreds of
-  requests/sec on modest hardware, including phones running Termux.
-- **Adaptive rate limiting** — backs off automatically on `429`/`503`
-  responses and speeds back up once the target recovers.
-- **Passive discovery (`--discover`)** — pulls extra candidate paths
-  out of `robots.txt` and `sitemap.xml`, carried forward from v3.0.
-- **Swagger / OpenAPI discovery** — checks common paths, parses JSON
-  or YAML specs, and expands them into a concrete endpoint list.
-- **BOLA / IDOR differential testing** — pass two tokens
-  (`--token-a` / `--token-b`) and compare access to the same resources.
-- **CORS misconfiguration detection** — flags reflected origins
-  combined with `Access-Control-Allow-Credentials: true`.
-- **Sensitive-data & exposure scanning** — greps responses for likely
-  secrets and stack traces, checks for missing security headers, and
-  probes a short list of commonly-exposed file paths (`.git/config`,
-  `.env`, etc.).
-- **JSON/HTML reporting** via `-o report.json` or `--format html`.
-- **30 unit tests** covering regex patterns, the rate limiter, and
-  every module's pure logic — no network needed to run them.
+Typical Usage Examples
+- Baseline discovery + secret grep:
+  python3 run.py -t https://api.target.com -w wordlist.txt
+- Pull extra paths from robots/sitemap:
+  python3 run.py -t https://api.target.com --discover
+- Auto-discover & expand Swagger/OpenAPI:
+  python3 run.py -t https://api.target.com --swagger
+- CORS check:
+  python3 run.py -t https://api.target.com -w wordlist.txt --cors
+- BOLA/IDOR check (two accounts you control):
+  python3 run.py -t https://api.target.com -w wordlist.txt --bola \
+    --token-a "$TOKEN_A" --token-b "$TOKEN_B"
+- Full assessment through a proxy, ignoring self-signed certs:
+  python3 run.py -t https://api.target.com -w wordlist.txt --all \
+    --proxy http://127.0.0.1:8080 --insecure -o report.html --format html
 
-## Installation (Termux / Linux)
+Why users should try it (short sales pitch)
+- Get actionable reconnaissance quickly: built to produce prioritized findings you can verify manually.
+- Lightweight & portable — runs on Termux (Android) and Linux with minimal fuss.
+- Tests and CI-friendly: you can validate behavior locally before trusting results.
+- Good for bug-bounty recon, internal API security assessments, and triage.
 
-```bash
-pkg update && pkg install python git   # Termux only
-git clone <your-fork-url> ninja-api-hunter
-cd ninja-api-hunter
-pip install -r requirements.txt
-# optional: install as a CLI command
-pip install -e .
+Example output (excerpt)
+```json
+{
+  "target": "https://api.target.com",
+  "findings": [
+    { "path": "/.git/config", "status": 200, "note": "Possible exposed repo config" },
+    { "path": "/v1/users/123", "status": 200, "diff": "BOLA-like response difference between tokens" }
+  ]
+}
 ```
 
-## Usage
+Configuration & flags (summary)
+- -t, --target TARGET            Target base URL
+- -w, --wordlist WORDLIST        Path to endpoint wordlist
+- -m, --method {GET,POST,...}    HTTP methods to try
+- -H, --headers HEADERS          Custom header (repeatable) e.g. -H "Authorization: Bearer X"
+- --bola --token-a --token-b     BOLA/IDOR differential test (requires tokens)
+- --swagger                      Parse and expand Swagger/OpenAPI
+- --discover                     Pull candidate paths from robots/sitemap
+- --cors                         Run CORS reflection checks
+- --exposures                    Probe common sensitive paths
+- --proxy PROXY                  Proxy URL (e.g., http://127.0.0.1:8080)
+- -k, --insecure                 Disable SSL verification
+- -o, --output OUTPUT            Report output path
+- --format {json,html}           Report format
 
-```bash
-# Baseline discovery + secret/stack-trace grep over a wordlist
-python3 run.py -t https://api.target.com -w wordlist.txt
-
-# Pull extra paths from robots.txt / sitemap.xml
-python3 run.py -t https://api.target.com --discover
-
-# Auto-discover and expand a Swagger/OpenAPI spec
-python3 run.py -t https://api.target.com --swagger
-
-# Probe common exposed-file paths
-python3 run.py -t https://api.target.com --exposures
-
-# CORS misconfiguration check
-python3 run.py -t https://api.target.com -w wordlist.txt --cors
-
-# BOLA/IDOR check between two accounts you control
-python3 run.py -t https://api.target.com -w wordlist.txt \
-  --bola --token-a "$TOKEN_A" --token-b "$TOKEN_B"
-
-# Everything, with an HTML report, through Burp, ignoring a self-signed cert
-python3 run.py -t https://api.target.com -w wordlist.txt --all \
-  --proxy http://127.0.0.1:8080 --insecure -o report.html --format html
-```
-
-Run `python3 run.py -h` for the full flag reference.
-
-## Running the tests
-
+Tests
+Run unit tests locally:
 ```bash
 python3 -m unittest discover -s tests -v
+# Expect: "Ran 30 tests in 0.0xxs" and OK
 ```
 
-## Project layout
+Security & Responsible Use
+- Use only on systems you own or are explicitly authorized to test.
+- This tool is for reconnaissance and detection; flagged results require manual verification before any exploit or disclosure.
+- The authors take no responsibility for misuse.
 
+Contributing
+- Found a bug or want a feature? Please open an Issue.
+- Want to contribute code? Fork, create a branch (e.g., improve/readme), make changes, run tests, and open a Pull Request.
+- Add small, self-contained changes; include tests where applicable.
+- See CONTRIBUTING.md (suggested) for detailed guidelines.
+
+First-time contributor checklist
+- Fork the repo
+- Create a branch with descriptive name
+- Run tests: python3 -m unittest discover -s tests -v
+- Keep PRs focused and include a clear description
+
+FAQ / Troubleshooting (quick)
+- Q: I get SSL errors on Termux — A: Use `-k/--insecure` for self-signed, or add the CA to your system.
+- Q: Too slow? — A: Check `--threads` and let the rate limiter adapt; use a local proxy (Burp) if needed.
+- Q: False positives on secrets — A: Patterns are heuristics; inspect flagged items manually.
+
+Changelog
+- v4.0 — BOLA/IDOR checks, CORS detection, Swagger parsing, improved discovery, adaptive rate limiting, JSON/HTML reporting.
+
+License
+MIT — see LICENSE file.
+
+Contact / Support
+- Repo: https://github.com/sa0156553345-cmyk/Ninja-API-Hunter
+- Open an issue or file a PR. If you want professional help, include repro steps and sample outputs.
+
+Call to action
+Try it now:
+```bash
+python3 run.py -t https://api.target.com -w wordlist.txt
 ```
-ninja-api-hunter/
-├── ninja_hunter/
-│   ├── cli.py              # argument parsing + orchestration
-│   ├── core/
-│   │   ├── engine.py        # aiohttp request engine
-│   │   └── rate_limiter.py  # adaptive 429/503 backoff
-│   ├── modules/
-│   │   ├── bola.py
-│   │   ├── cors.py
-│   │   ├── discovery.py     # robots.txt / sitemap.xml (v3.0 carryover)
-│   │   ├── swagger.py
-│   │   └── exposures.py
-│   ├── utils/
-│   │   ├── logger.py
-│   │   ├── reporter.py
-│   │   └── helpers.py       # pure helpers, no aiohttp dependency
-│   └── config.py
-├── tests/
-│   └── test_modules.py
-├── run.py
-├── requirements.txt
-├── setup.py
-├── LICENSE
-├── .gitignore
-└── README.md
-```
+If it helped you, please:
+- Star the repository ⭐
+- Open issues for problems or feature requests
+- Share example reports (sanitized) so we can improve detection rules
 
-`utils/helpers.py` isn't in the original v4.0 spec's file list — it was
-split out of `cli.py` so pure logic (header parsing, status
-classification, wordlist loading) can be unit-tested without needing
-`aiohttp` installed, and so the test suite stays fast and
-dependency-light.
-
-## Known limitations
-
-- No JavaScript rendering — single-page apps that build routes
-  client-side won't be fully mapped by wordlist/Swagger discovery alone.
-- The secret scanner is regex pattern matching, not entropy analysis,
-  so it will miss custom token formats and can false-positive on
-  test/sample data.
-- BOLA testing compares two fixed tokens against the same URL list; it
-  doesn't yet walk numeric/sequential IDs automatically.
-- The `proxy` option supports HTTP(S) proxies (e.g. Burp Suite);
-  SOCKS proxies would need the optional `aiohttp-socks` package.
-
-## Changelog
-
-- **v2.0** — single-file path fuzzer + response grep.
-- **v3.0** — modular architecture, 22 unit tests, SSL verification on
-  by default, robots.txt/sitemap/Swagger-aware discovery, passive
-  exposure checks.
-- **v4.0** — BOLA/IDOR differential testing, CORS misconfiguration
-  detection, automatic Swagger/OpenAPI parsing, robots.txt/sitemap.xml
-  discovery (carried forward from v3.0), adaptive rate limiting,
-  JSON/HTML reporting, installable package layout.
-
-## License
-
-MIT — see [LICENSE](LICENSE). Edit the copyright line in that file if
-you want your own name on it instead of the placeholder.
+---
+(Arabic summary / ملخص عربي مختصر follows)
+## ملخص عربي موجز
+Ninja-API-Hunter أداة خفيفة وغير متزامنة لفحص واجهات الـ API وإيجاد أنماط قد تدل على مشاكل أمنية. مناسبة للـ Termux والـ Linux، تُنتج تقارير JSON/HTML، وتدعم تحليل Swagger، واختبارات BOLA/IDOR وCORS. استخدمها فقط لأنظمة تملك تصريحًا قانونيًا لاختبارها.
